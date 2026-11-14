@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>FAQ chatbot demo</title>
+<style>body{font:16px system-ui;max-width:44rem;margin:3rem auto;padding:0 1rem}#chat{border:1px solid #aaa;padding:1rem;min-height:10rem}p{line-height:1.5}form{display:flex;gap:.5rem;margin-top:1rem}input{flex:1;padding:.6rem}button{padding:.6rem}</style>
+<h1>FAQ chatbot demo</h1><p>Ask about hours, returns, or support. Answers use a small fictional FAQ.</p>
+<div id="chat" aria-live="polite"></div>
+<form id="form"><label for="message">Message</label><input id="message" maxlength="500" required><button>Send</button></form>
+<script>
+const chat = document.querySelector('#chat');
+document.querySelector('#form').addEventListener('submit', async event => {
+  event.preventDefault();
+  const input = document.querySelector('#message');
+  const message = input.value.trim();
+  if (!message) return;
+  const line = document.createElement('p'); line.textContent = `You: ${message}`; chat.append(line);
+  input.value = '';
+  try {
+    const response = await fetch('/api/chat', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ message }) });
+    const data = await response.json();
+    const reply = document.createElement('p'); reply.textContent = `Bot: ${data.answer || data.error}`; chat.append(reply);
+  } catch {
+    const reply = document.createElement('p'); reply.textContent = 'Bot: The demo is unavailable.'; chat.append(reply);
+  }
+});
+</script></html>
